@@ -2,6 +2,7 @@ import numpy as np
 from sklearn import linear_model
 
 from automatic_diff.linear_regression import LinearRegression
+import automatic_diff.learning_rates as learn_rates
 from tests.utils import DualNumberTestCase
 
 
@@ -31,5 +32,21 @@ class TestLinearRegression(DualNumberTestCase):
 
         model = LinearRegression([[x] for x in self.X], self.y, init_params=[0, 1])
         params = model.fit(max_iters=1000, tol=1e-3, lr=0.005, verbose=True)
+        self.assertAlmostEqual(params.x[0], self.intercept, places=1)
+        self.assertAlmostEqual(params.x[1], self.slope, places=1)
+
+    def test_fit_linear_regression_time_decaying_lr(self):
+
+        model = LinearRegression([[x] for x in self.X], self.y, init_params=[0, 1])
+        lr = learn_rates.TimeDecayLearningRate(lr=0.1, decay_rate=0.1)
+        params = model.fit(max_iters=1000, tol=1e-3, lr=lr, verbose=True)
+        self.assertAlmostEqual(params.x[0], self.intercept, places=1)
+        self.assertAlmostEqual(params.x[1], self.slope, places=1)
+
+    def test_fit_linear_regression_grad_decaying_lr(self):
+
+        model = LinearRegression([[x] for x in self.X], self.y, init_params=[0, 1])
+        lr = learn_rates.GradDecayLearningRate(lr=0.1)
+        params = model.fit(max_iters=1000, tol=1e-5, lr=lr, verbose=True)
         self.assertAlmostEqual(params.x[0], self.intercept, places=1)
         self.assertAlmostEqual(params.x[1], self.slope, places=1)
