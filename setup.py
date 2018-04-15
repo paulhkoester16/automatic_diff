@@ -8,5 +8,5 @@ setup(
     version='0.1.0',
     description='naive automatic differentiation via dual numbers',
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
-    install_requires=['numpy']
+    install_requires=['numpy', 'scikit-learn']
 )

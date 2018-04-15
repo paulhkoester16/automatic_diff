@@ -1,11 +1,9 @@
-import unittest
 import numpy as np
 from sklearn import linear_model
 
-from automatic_diff.dual_number import DualNumber
-from automatic_diff.grad_descent import grad_descent
-
+from automatic_diff.linear_regression import LinearRegression
 from tests.utils import DualNumberTestCase
+
 
 class TestLinearRegression(DualNumberTestCase):
 
@@ -26,17 +24,12 @@ class TestLinearRegression(DualNumberTestCase):
         self.assertAlmostEqual(self.slope, slope[0], places=1)
         self.assertAlmostEqual(self.intercept, intercept, places=1)
 
-
     def test_noise(self):
         self.assertAlmostEqual(sum(self.noise), 0)
 
-    def test_fit_linear_regression(self):
+    def test_fit_linear_regression_via_class(self):
 
-        def loss_func(slope, intercept):
-            return sum((slope * x + intercept - y)**2 for x, y in zip(self.X, self.y))**0.5
-
-        init_params = np.array([1, 0])
-        params, loss, dloss = grad_descent(init_params, loss_func, max_iters=1000, tol=1e-3, lr=0.005, verbose=True)
-
-        self.assertAlmostEqual(params.x[0], self.slope, places=1)
-        self.assertAlmostEqual(params.x[1], self.intercept, places=1)
+        model = LinearRegression([[x] for x in self.X], self.y, init_params=[0, 1])
+        params = model.fit(max_iters=1000, tol=1e-3, lr=0.005, verbose=True)
+        self.assertAlmostEqual(params.x[0], self.intercept, places=1)
+        self.assertAlmostEqual(params.x[1], self.slope, places=1)
