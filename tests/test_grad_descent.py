@@ -21,9 +21,8 @@ class TestGradDescent(DualNumberTestCase):
     def test_bivar_grad_descent(self):
         tol = 1e-2
         func = lambda d_0, d_1: (d_0 - 2)**2 + (d_1 + 3)**2 + 8
-        initial_x = np.array([10, 5])
+        initial_x = np.array([10, 12])
         x, y, dy = grad_descent(initial_x, func, max_iters=100, tol=tol, lr=0.6)
-
         self.assertAlmostEqual(x.x[0], 2, places=1)
         self.assertAlmostEqual(x.x[1], -3, places=1)
         self.assertAlmostEqual(y, 8, places=1)
