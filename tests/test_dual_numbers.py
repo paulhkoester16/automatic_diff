@@ -69,6 +69,7 @@ class TestDualNumberUnaryOps(unittest.TestCase):
         expected = DualNumber([4, 2, 3, 2], [-6, -8, 3, 0])
         self.assertEqual(expected, actual)
 
+    @unittest.skip
     def test_round(self):
         actual = round(DualNumber([2.8, 3.13, -1.97, -3.42], [2.8, 3.13, -1.97, -3.42]), 1)
         expected = DualNumber([2.8, 3.1, -2.0, -3.4], [2.8, 3.1, -2.0, -3.4])
