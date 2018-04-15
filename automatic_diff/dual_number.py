@@ -127,3 +127,7 @@ class DualNumber:
     def __le__(self, other):
         other = DualNumber.create(other)
         return self.x <= other.x
+
+    @property
+    def size_dx(self):
+        return np.linalg.norm(self.dx)

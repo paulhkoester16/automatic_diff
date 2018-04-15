@@ -1,23 +1,25 @@
 import numpy as np
 from automatic_diff.dual_number import DualNumber
+from automatic_diff.gradients import gradient
 
 
 def _grad_descent_step(x, func, lr=0.01):
-    y = func(x)
-    new_dx = - y.dx * lr
-    new_x = x.x + new_dx
+    y, grad = gradient(x, func)
+    new_dx = - np.array(grad) * lr
+    new_x = x + new_dx
     return DualNumber(new_x, new_dx)
 
 
 def grad_descent(initial_x, func, tol=1e-2, max_iters=10, lr=0.1):
     num_iter = 0
-    x = DualNumber(initial_x, np.array([1]))
-    while abs(x.dx) > tol and num_iter < max_iters:
+    dual_x = DualNumber.create(initial_x)
+    dual_x.dx = 2 * tol * np.ones_like(dual_x.dx)
+    while num_iter < max_iters and dual_x.size_dx > tol:
         num_iter += 1
-        x.dx = np.array([1])
-        x = _grad_descent_step(x, func, lr)
+        dual_x = _grad_descent_step(dual_x.x, func, lr)
         print("Iteration {}".format(num_iter))
-        print("\tx:  {}".format(x))
-    y = func(x)
+        print("\tx:  {}".format(dual_x))
+    y, dy = gradient(dual_x.x, func)
+
     print("y:  {}".format(y))
-    return x, y
+    return dual_x, y, dy
