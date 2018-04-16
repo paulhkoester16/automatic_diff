@@ -55,7 +55,7 @@ class GradientDescent:
     def _grad_descent_step(self):
         self.y, self.dy = gradient(self.x, self.func)
         new_dx = self.lr.update(self)
-        new_x = self.x + new_dx
+        new_x = self.x - new_dx
         self.dual_x = DualNumber(new_x, new_dx)
 
 

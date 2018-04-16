@@ -23,7 +23,7 @@ class LearningRate:
         self.__lr = lr
 
     def update(self, grad_descent):
-        return - np.array(grad_descent.dy) * self.lr
+        return np.array(grad_descent.dy) * self.lr
 
 
 class TimeDecayLearningRate(LearningRate):
@@ -34,7 +34,7 @@ class TimeDecayLearningRate(LearningRate):
 
     def update(self, grad_descent):
         self.lr = self._init_lr / (1 + self.decay_rate * grad_descent.num_iter)
-        return - np.array(grad_descent.dy) * self.lr
+        return np.array(grad_descent.dy) * self.lr
 
 
 class GradDecayLearningRate(LearningRate):
@@ -63,17 +63,21 @@ class GradDecayLearningRate(LearningRate):
             if len(self.prev_lr) > self.patience:
                 self.prev_lr.pop(0)
             self.lr = np.mean(self.prev_lr)
-            print(self.lr)
-        return - np.array(grad_descent.dy) * self.lr
+        return np.array(grad_descent.dy) * self.lr
+
 
 class MomentumLearningRate(LearningRate):
 
-    def __init__(self, momentum_rate=0.9, **kwargs):
+    def __init__(self, momentum_rate=0.9, decay_rate=1e-1, **kwargs):
         super().__init__(**kwargs)
         self.momentum_rate = momentum_rate
+        self.decay_rate = decay_rate
         self.nu = None
 
-#    def update(self, **kwargs):
-#
-#        self.lr = self._init_lr / (1 + self.decay_rate * self.num_iters)
-#        self.num_iters += 1
+    def update(self, grad_descent):
+        self.lr = self._init_lr / (1 + self.decay_rate * grad_descent.num_iter)
+        if grad_descent.num_iter == 0:
+            self.nu = np.zeros_like(grad_descent.x)
+        self.nu = self.momentum_rate * self.nu + np.array(grad_descent.dy) * self.lr
+        print(self.nu)
+        return self.nu
