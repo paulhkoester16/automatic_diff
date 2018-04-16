@@ -13,7 +13,6 @@ class LearningRate:
     def __init__(self, lr=0.1):
         self._init_lr = lr
         self.lr = self._init_lr
-        self.num_iters = 0
 
     @property
     def lr(self):
@@ -23,8 +22,8 @@ class LearningRate:
     def lr(self, lr):
         self.__lr = lr
 
-    def update(self, **kwargs):
-        self.num_iters += 1
+    def update(self, grad_descent):
+        return - np.array(grad_descent.dy) * self.lr
 
 
 class TimeDecayLearningRate(LearningRate):
@@ -33,9 +32,9 @@ class TimeDecayLearningRate(LearningRate):
         super().__init__(**kwargs)
         self.decay_rate = decay_rate
 
-    def update(self, **kwargs):
-        self.num_iters += 1
-        self.lr = self._init_lr / (1 + self.decay_rate * self.num_iters)
+    def update(self, grad_descent):
+        self.lr = self._init_lr / (1 + self.decay_rate * grad_descent.num_iter)
+        return - np.array(grad_descent.dy) * self.lr
 
 
 class GradDecayLearningRate(LearningRate):
@@ -49,13 +48,13 @@ class GradDecayLearningRate(LearningRate):
         self.prev_x = None
         self.prev_lr = []
 
-    def update(self, x, dy, **kwargs):
-        if self.num_iters > 0:
+    def update(self, grad_descent):
+        if grad_descent.num_iter > 0:
             self.prev_dy = self.this_dy.copy()
             self.prev_x = self.this_x.copy()
-        self.this_dy = np.array(dy)
-        self.this_x = np.array(x)
-        if self.num_iters > 0:
+        self.this_dy = np.array(grad_descent.dy)
+        self.this_x = np.array(grad_descent.x)
+        if grad_descent.num_iter > 0:
             delta_dy = self.this_dy - self.prev_dy
             delta_x = self.this_x - self.prev_x
             self.lr = np.dot(delta_x, delta_dy) / np.dot(delta_dy, delta_dy)
@@ -65,5 +64,16 @@ class GradDecayLearningRate(LearningRate):
                 self.prev_lr.pop(0)
             self.lr = np.mean(self.prev_lr)
             print(self.lr)
+        return - np.array(grad_descent.dy) * self.lr
 
-        self.num_iters += 1
+class MomentumLearningRate(LearningRate):
+
+    def __init__(self, momentum_rate=0.9, **kwargs):
+        super().__init__(**kwargs)
+        self.momentum_rate = momentum_rate
+        self.nu = None
+
+#    def update(self, **kwargs):
+#
+#        self.lr = self._init_lr / (1 + self.decay_rate * self.num_iters)
+#        self.num_iters += 1
