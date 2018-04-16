@@ -41,23 +41,22 @@ class GradientDescent:
     def fit(self, initial_x=None, tol=1e-2, max_iters=10, lr=0.1, verbose=False):
         num_iter = 0
         self.lr = lr
-        dual_x = DualNumber.create(initial_x)
-        dual_x.dx = 2 * tol * np.ones_like(dual_x.dx)
-        while num_iter < max_iters and dual_x.size_dx > tol:
+        self.dual_x = DualNumber.create(initial_x)
+        self.dual_x.dx = 2 * tol * np.ones_like(self.dx)
+        while num_iter < max_iters and self.dual_x.size_dx > tol:
             num_iter += 1
-            dual_x = self._grad_descent_step(dual_x.x)
+            self._grad_descent_step()
             if verbose:
-                print("Iteration {}\n\tx:  {}\n".format(num_iter, dual_x))
+                print("Iteration {}\n\tx:  {}\n".format(num_iter, self.dual_x))
         if verbose:
             print("y:  {}\n".format(self.y))
-        self.dual_x = dual_x
 
-    def _grad_descent_step(self, x):
-        self.y, self.dy = gradient(x, self.func)
+    def _grad_descent_step(self):
+        self.y, self.dy = gradient(self.x, self.func)
         new_dx = - np.array(self.dy) * self.lr.lr
-        new_x = x + new_dx
+        new_x = self.x + new_dx
         self.lr.update(x=new_x, dx=new_dx, y=self.y, dy=self.dy)
-        return DualNumber(new_x, new_dx)
+        self.dual_x = DualNumber(new_x, new_dx)
 
 
 def grad_descent(initial_x, func, **kwargs):
