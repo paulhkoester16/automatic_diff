@@ -18,17 +18,22 @@ class Model(metaclass=abc.ABCMeta):
         Initial values for the model's parameters that will be learned
     '''
     def __init__(self, X, y, init_params=None):
-        self.X = X
+        self.X = np.array(X)
+        if self.X.ndim == 1:
+            self.X = self.X.reshape((1, len(self.X)))
         self.y = y
         self.init_params = init_params
 
     @property
     def init_params(self): # pylint: disable=missing-docstring
-        return self.__init_params
+        return self.__init_params # pragma: no cover
 
+    # pragma pylint: disable=attribute-defined-outside-init
     @init_params.setter
     def init_params(self, init_params):
-        self.__init_params = init_params # pylint: disable=attribute-defined-outside-init
+        self.__init_params = init_params # pragma: no cover
+    # pragma pylint: enable=attribute-defined-outside-init
+
 
     def fit(self, *args, **kwargs):
         '''
@@ -47,7 +52,7 @@ class Model(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def loss_func(self, *params):
         '''loss function by which model is optimized against'''
-        pass
+        pass  # pragma: no cover
 
 
 class LinearRegression(Model):
@@ -60,8 +65,8 @@ class LinearRegression(Model):
 
     @init_params.setter
     def init_params(self, init_params=None):
-        if not init_params:
-            init_params = np.random.uniform(-1, 1, len(self.X) + 1)
+        if init_params is None:
+            init_params = np.random.uniform(-1, 1, self.X.shape[1] + 1)
         self.__init_params = init_params # pylint: disable=attribute-defined-outside-init
 
     def loss_func(self, *params):

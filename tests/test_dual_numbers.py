@@ -20,6 +20,7 @@ class TestDualNumberConstructor(unittest.TestCase):
         dual_number = DualNumber(x, dx)
         npt.assert_equal(x, dual_number.x)
         npt.assert_equal(dx, dual_number.dx)
+        self.assertEqual(dual_number.shape, x.shape)
 
     def test_constructor_with_arrays(self):
         x = np.array([[1, 4]])
@@ -165,3 +166,40 @@ class TestQuotientRule(unittest.TestCase):
         actual = x1 / DualNumber(x2, dx2)
         expected = DualNumber(x1 / x2, -x1 * dx2/ x2**2)
         self.assertEqual(expected, actual)
+
+class TestEquality(unittest.TestCase):
+
+    def test_different_x(self):
+        x1 = DualNumber([5, 2], [1, 1])
+        x2 = DualNumber([3, 2], [1, 1])
+        self.assertNotEqual(x1, x2)
+
+    def test_different_dx(self):
+        x1 = DualNumber([5, 2], [1, 0])
+        x2 = DualNumber([5, 2], [1, 1])
+        self.assertNotEqual(x1, x2)
+
+    def test_different_sizes(self):
+        x1 = DualNumber([5, 2], [1, 0])
+        x2 = DualNumber([5], [1])
+        self.assertNotEqual(x1, x2)
+
+    def test_different_types(self):
+        x1 = DualNumber(5, 1)
+        x2 = 7
+        self.assertNotEqual(x1, x2)
+
+    def test_inequality(self):
+        self.assertGreater(DualNumber(5, 1), DualNumber(3, 7))
+        self.assertGreaterEqual(DualNumber(5, 1), DualNumber(3, 7))
+        self.assertGreaterEqual(DualNumber(5, 1), DualNumber(5, 7))
+        self.assertGreaterEqual(DualNumber(5, 7), DualNumber(5, 1))
+        self.assertLess(DualNumber(3, 7), DualNumber(5, 1))
+        self.assertLessEqual(DualNumber(3, 7), DualNumber(5, 1))
+        self.assertGreaterEqual(DualNumber(5, 1), DualNumber(5, 7))
+        self.assertGreaterEqual(DualNumber(5, 7), DualNumber(5, 1))
+
+
+
+
+

@@ -114,3 +114,27 @@ class TestChainRule(DualNumberTestCase):
         actual = outer
         expected = DualNumber(np.exp(np.sin(x)), np.exp(np.sin(x)) * np.cos(x) * dx)
         self.assertAlmostEqual(expected, actual)
+
+class TestMatMul(DualNumberTestCase):
+
+    def test_matmul(self):
+        matrix = np.array([[1, 2], [3, 4], [5, 6]])
+        d = DualNumber([5, 7], [1, 3])
+        actual = fn.matmul(matrix, d)
+        expected = DualNumber(np.array([19, 43, 67]), np.array([7, 15, 23]))
+        self.assertEqual(expected, actual)
+
+    def test_matmul_lists(self):
+        matrix = np.array([[1, 2], [3, 4], [5, 6]])
+        d = DualNumber([5, 7], [1, 3])
+        actual = fn.matmul(matrix, d)
+        expected = DualNumber([19, 43, 67], [7, 15, 23])
+        self.assertEqual(expected, actual)
+
+    def test_matmul_scalar(self):
+        matrix = np.array([[1], [3], [5]])
+        d = DualNumber(5, 2)
+        actual = fn.matmul(matrix, d)
+        expected = DualNumber([[5], [15], [25]], [[2], [6], [10]])
+        self.assertEqual(expected, actual)
+

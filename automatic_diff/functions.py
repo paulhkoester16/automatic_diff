@@ -67,6 +67,11 @@ def sech(d: DualNumber):
 
 
 def matmul(matrix: np.ndarray, d: DualNumber):
-    x = d.x if isinstance(d.x, np.ndarray) else np.array([d.x])
-    dx = d.dx if isinstance(d.dx, np.ndarray) else np.array([d.dx])
-    return DualNumber(np.matmul(matrix, x), np.matmul(matrix, dx))
+    if d.shape:
+        x = np.matmul(matrix, d.x)
+        dx = np.matmul(matrix, d.dx)
+    else:
+        x = matrix * d.x
+        dx = matrix * d.dx
+
+    return DualNumber(x, dx)
