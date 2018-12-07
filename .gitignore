@@ -1,1 +1,7 @@
 .idea
+**__pycache__
+**egg-info
+**cover
+**.coverage
+**.swp
+**.ipynb_checkpoints/

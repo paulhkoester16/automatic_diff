@@ -1,20 +1,43 @@
+'''
+Dual Numbers provide (x, dx) tuples with algebraic structure, so that
+(x, dx) + (y, dy) = (x + y, dx + dy)
+and
+(x, dx) * (y, dy) = (x*y, x*dy + y*dx)
+'''
 import numpy as np
 
 
 class DualNumberError(Exception):
+    '''Error handling for Dual numbers'''
     pass
 
 
 class DualNumber:
+    '''
+    Parameters
+    ----------
+    x: float or np.array
+        Corresponds to a variable.
+    dx: float or np.array
+        Corresponds to gradient step. Must be same shape as `x`
+    '''
 
     @classmethod
     def create(cls, val):
-        if isinstance(val, cls):
-            return val
-        else:
+        '''
+        Factory for creating DualNumbers
+
+        Parameters
+        ----------
+        val: Either DualNumber instance or float or np.array
+            If float or np.array, initializes a DualNumber with
+            `x=val` and `dx=zeros`
+        '''
+        if not isinstance(val, cls):
             x = np.array(val)
             zero = np.zeros_like(x)
-            return cls(x=x, dx=zero)
+            val = cls(x=x, dx=zero)
+        return val
 
     def __init__(self, x, dx):
         self.x = x
@@ -25,26 +48,26 @@ class DualNumber:
         if self.x.shape != self.dx.shape:
             raise DualNumberError(
                 "x and dx must have same shape but got {} and {}".format(
-                self.x.shape, self.dx.shape))
+                    self.x.shape, self.dx.shape))
 
     @property
-    def x(self):
+    def x(self): # pylint: disable=missing-docstring
         return self.__x
 
     @x.setter
     def x(self, value):
-        self.__x = np.array(value)
+        self.__x = np.array(value) # pylint: disable=attribute-defined-outside-init
 
     @property
-    def dx(self):
+    def dx(self): # pylint: disable=missing-docstring
         return self.__dx
 
     @dx.setter
     def dx(self, value):
-        self.__dx = np.array(value)
+        self.__dx = np.array(value) # pylint: disable=attribute-defined-outside-init
 
     @property
-    def shape(self):
+    def shape(self): # pylint: disable=missing-docstring
         return self.x.shape
 
     def __repr__(self):
@@ -129,5 +152,5 @@ class DualNumber:
         return self.x <= other.x
 
     @property
-    def size_dx(self):
+    def size_dx(self): # pylint: disable=missing-docstring
         return np.linalg.norm(self.dx)

@@ -1,3 +1,7 @@
+'''
+Transcendental functions for dual numbers
+'''
+# pylint: disable=missing-docstring
 import numpy as np
 from automatic_diff.dual_number import DualNumber
 
